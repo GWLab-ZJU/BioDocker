@@ -1,0 +1,2 @@
+docker run -d -p 8787:8787 -p 2287:22 --name=rstudio9 --restart=always --volume /root/data:/home/guest/data --cpus 1 rstudio-server
+docker run -d -p 8929:8929 --name=gitlab --restart=always --volume /srv/gitlab/config:/etc/gitlab --volume /srv/gitlab/logs:/var/log/gitlab  --volume /srv/gitlab/data:/var/opt/gitlab --cpus 2 gitlab/gitlab-ce:latest
