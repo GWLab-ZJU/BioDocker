@@ -2,8 +2,8 @@ docker run -d --name=rstudio9 \
 -p 8787:8787 -p 2287:22 \
 --restart=always --cpus 1 \
 -u "$(id -u):$(id -g)" \
--v "$PWD:/home/guest/data" \
-rstudio-server
+-v "${PWD}:/home/guest/data" \
+rstudio-server-minimun
 
 docker run -d --name=gitlab \
 -p 8929:8929 \
