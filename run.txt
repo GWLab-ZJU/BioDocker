@@ -1,5 +1,5 @@
 docker run -d --name=rstudio9 \
--p 8787:8787 -p 2287:22 \
+-p 8787:8787 -p 2287:2287 \
 --restart=always --cpus 1 \
 -u "$(id -u):$(id -g)" \
 -v "${PWD}:/home/guest/data" \
@@ -8,14 +8,67 @@ rstudio-server-minimun
 docker run -d --name=gitlab \
 -p 8929:8929 \
 --restart=always --cpus 2 \
--v /srv/gitlab/config:/etc/gitlab \
--v /srv/gitlab/logs:/var/log/gitlab  \
--v /srv/gitlab/data:/var/opt/gitlab \
+-v "${HOME}"/etc/gitlab:/etc/gitlab \
+-v "${HOME}"/var/log/gitlab:/var/log/gitlab  \
+-v "${HOME}"/var/opt/gitlab:/var/opt/gitlab \
 gitlab/gitlab-ce:latest
 
 docker run -it --rm --name=vscode \
 -p 8080:8080 \
---cpus 1\
+--cpus 1 \
 -u "$(id -u):$(id -g)" \
--v "$PWD:/home/coder/project" \
+-v "${PWD}:/home/coder/project" \
 codercom/code-server
+
+docker run -d --name my_postgres \
+-p 5432:5432 \
+--network my_net --restart always \
+-v "${HOME}"/var/lib/postgresql/data:/var/lib/postgresql/data \
+-e POSTGRES_PASSWORD=postgres \
+postgres
+
+docker run -d --name my_wordpress \
+-p 80:80 \
+--network my_net --restart always \
+-e WORDPRESS_DB_HOST=my_mysql:3306 \
+-e WORDPRESS_DB_USER=root \
+-e WORDPRESS_DB_PASSWORD="root" \
+-e WORDPRESS_DB_NAME=wordpress \
+wordpress
+
+docker run -d --name my_mysql \
+--network my_net --restart always \
+-v "${HOME}"/etc/mysql:/etc/mysql \
+-v "${HOME}"/var/log/mysql:/var/log/mysql \
+-v "${HOME}"/var/lib/mysql:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=root -p 3306:3306 mysql
+
+docker run -d --name my_pgadmin4 \
+-p 80:80 \
+--network my_net --restart always \
+-e PGADMIN_DEFAULT_EMAIL="postgres@localhost" \
+-e PGADMIN_DEFAULT_PASSWORD="postgres" \
+dpage/pgadmin4
+
+docker run -d --name my_portainer \
+-p 9000:9000 \
+--network my_net --restart always \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v "${HOME}"/var/portainer:/data \
+portainer/portainer
+
+docker run -d --name my_openfire \
+-p 9090:9090 -p 5222:5222 -p 7777:7777 \
+--network my_net --restart always \
+--hostname YuZJLab \
+sameersbn/openfire
+
+docker exec -it my_postgres bash
+
+docker run --name my_wordpress --network my_net -p 80:80 --rm wordpress
+
+docker run -d --name my_mymediawiki \
+-p 88:80 \
+--restart always \
+-v "${HOME}"/var/www/data:/var/www/data \
+mediawiki
